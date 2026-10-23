@@ -1,6 +1,6 @@
 name: Quality checks
 
-on: 
+on:
   pull_request:
 
 jobs:
@@ -22,4 +22,4 @@ jobs:
       - name: Check code formatting
         run: npm run format:check
       #- name: TruffleHog OSS
-        #uses: trufflesecurity/trufflehog@v3.99.4
+      #uses: trufflesecurity/trufflehog@v3.99.4
