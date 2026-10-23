@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      checks: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
@@ -27,3 +28,12 @@ jobs:
         uses: trufflesecurity/trufflehog@v3.99.4
         with:
           extra_args: --results=verified,unknown
+      - name: Run unittests
+        run: npm test
+      - name: Collect test results in a report
+        uses: dorny/test-reporter@v3.0.0
+        if: ${{ !cancelled() }}
+        with:
+          name: Test-results
+          path: ./junit.xml
+          reporter: jest-junit
