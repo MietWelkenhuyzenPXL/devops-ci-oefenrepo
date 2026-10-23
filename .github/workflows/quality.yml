@@ -26,4 +26,4 @@ jobs:
       - name: Scan for secrets
         uses: trufflesecurity/trufflehog@v3.99.4
         with:
-          extra-args: --results=verified,unknown
+          extra_args: --results=verified,unknown
