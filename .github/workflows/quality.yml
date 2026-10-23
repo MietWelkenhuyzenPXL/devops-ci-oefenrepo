@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
       - name: Setup Node.js
         uses: actions/setup-node@v7.1.0
         with:
@@ -21,5 +23,7 @@ jobs:
         run: npm run lint
       - name: Check code formatting
         run: npm run format:check
-      #- name: TruffleHog OSS
-      #uses: trufflesecurity/trufflehog@v3.99.4
+      - name: Scan for secrets
+        uses: trufflesecurity/trufflehog@v3.99.4
+        with:
+          extra-args: --results=verified,unknown
