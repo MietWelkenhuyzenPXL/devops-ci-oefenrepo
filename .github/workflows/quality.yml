@@ -1,6 +1,6 @@
 name: Quality checks
 
-on: 
+on:
   pull_request:
 
 jobs:
@@ -8,9 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      checks: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
       - name: Setup Node.js
         uses: actions/setup-node@v7.1.0
         with:
@@ -21,5 +24,23 @@ jobs:
         run: npm run lint
       - name: Check code formatting
         run: npm run format:check
-      #- name: TruffleHog OSS
-        #uses: trufflesecurity/trufflehog@v3.99.4
+      - name: Scan for secrets
+        uses: trufflesecurity/trufflehog@v3.99.4
+        with:
+          extra_args: --results=verified,unknown
+      - name: Run unittests
+        run: npm test
+      - name: Collect test results in a report
+        uses: dorny/test-reporter@v3.0.0
+        if: ${{ !cancelled() }}
+        with:
+          name: Test-results
+          path: ./junit.xml
+          reporter: jest-junit
+      - name: Upload test result artifact
+        uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: test-results
+          path: ./junit.xml
+          if-no-files-found: warn
