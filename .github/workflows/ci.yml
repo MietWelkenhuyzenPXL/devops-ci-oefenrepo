@@ -6,11 +6,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  CI:
+  build-and-push:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      # checks: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
@@ -19,9 +18,14 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push Docker images
+      - name: Build and push Docker image
         uses: docker/build-push-action@v7.4.0
         with:
           context: .
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/calculator-app:${{ github.sha }}
+      - name: Notify team on Discord
+        run: |
+          curl -H "Content-Type: application/json" --fail \
+          -d '{"content": "New image ${{ secrets.DOCKERHUB_USERNAME }}/calculator-app:${{ github.sha }} pushed to Docker Hub. https://hub.docker.com/r/${{ secrets.DOCKERHUB_USERNAME }}/calculator-app"}' \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
