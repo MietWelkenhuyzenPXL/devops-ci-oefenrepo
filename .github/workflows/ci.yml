@@ -18,14 +18,16 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Create short commit hash
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
       - name: Build and push Docker image
         uses: docker/build-push-action@v7.4.0
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/calculator-app:${{ github.sha }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/calculator-app:${{ env.SHORT_SHA }}
       - name: Notify team on Discord
         run: |
           curl -H "Content-Type: application/json" --fail \
-          -d '{"content": "New image ${{ secrets.DOCKERHUB_USERNAME }}/calculator-app:${{ github.sha }} pushed to Docker Hub. https://hub.docker.com/r/${{ secrets.DOCKERHUB_USERNAME }}/calculator-app"}' \
+          -d '{"content": "New image ${{ secrets.DOCKERHUB_USERNAME }}/calculator-app:${{ env.SHORT_SHA }} pushed to Docker Hub. https://hub.docker.com/r/${{ secrets.DOCKERHUB_USERNAME }}/calculator-app"}' \
           ${{ secrets.DISCORD_WEBHOOK_URL }}
